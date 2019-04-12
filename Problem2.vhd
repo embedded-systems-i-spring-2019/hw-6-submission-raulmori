@@ -4,8 +4,8 @@ use IEEE.std_logic_1164.all;
 
 entity problem2_FSM is                          -- entity
         port ( 
-                x1, x2, clk : in std_logic;
-                Y : out std_logic_vector(1 downto 0);
+                x1, x2, clk : in std_logic;                       --Notice we have a clock and two inputs
+                Y : out std_logic_vector(1 downto 0);            
                 Z : out std_logic);
 end problem2_FSM;
 
