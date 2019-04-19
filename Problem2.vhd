@@ -4,12 +4,12 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 
 
-entity Finite_State_Machine is                          -- entity
+entity Finite_State_Machine is                         
         port ( 
-                x1, x2 : in std_logic;                       --These are the inputs inside the Logic
+                x1, x2 : in std_logic;                     --These are the inputs inside the Logic
                 clk : in std_logic;                        --This is the CLOCK
-                Z : out std_logic);                         --This is the only output inside the Logic
-                Y : out std_logic_vector(1 downto 0);       --This is and outside output, were we use a 2-bit output to manually represent the "PRESENT-STATE"
+                Z : out std_logic);                         --This is one of the "MAIN-OUTPUTS"
+                Y : out std_logic_vector(1 downto 0);       --This is the other "MAIN-OUTPUTS" that has a variation of "2". We manually represent the "PRESENT-STATE"
         
 end Finite_State_Machine;
 
