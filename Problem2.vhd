@@ -1,63 +1,65 @@
+--Notice that in this problem we don't have a "SET", "CLEAR" or "RESET"
+--Also this problem has only one "MAIN-INPUT", but that "Main-Input" has 2 variations
 library IEEE;
 use IEEE.std_logic_1164.all;
 
 
-entity problem2_FSM is                          -- entity
+entity Finite_State_Machine is                          -- entity
         port ( 
-                x1, x2, clk : in std_logic;                       --Notice we have a clock and two inputs
-                Y : out std_logic_vector(1 downto 0);            
-                Z : out std_logic);
-end problem2_FSM;
+                x1, x2 : in std_logic;                       --These are the inputs inside the Logic
+                clk : in std_logic;                        --This is the CLOCK
+                Z : out std_logic);                         --This is the only output inside the Logic
+                Y : out std_logic_vector(1 downto 0);       --This is and outside output, were we use a 2-bit output to manually represent the "PRESENT-STATE"
+        
+end Finite_State_Machine;
 
 
-architecture behavioral of problem2_FSM is                      -- architecture
+architecture behavioral of Finite_State_Machine is                      -- architecture
 
-        type state_type is (ST0,ST1,ST2);                  --create new type
-        signal PS,NS : state_type;                      --present state, next state
+        type state_type is (ST0,ST1,ST2);                  --create "TEMPORARY-VARIABLES" for the three "STATES" (Notice they are "TYPE-state_type")
+        signal PS,NS : state_type;                      --Here we create Temporary "SIGNALS" for "Present-State" and "Next-State"
 
         begin
-
-                 sync_proc: process(CLK,NS)                      --process states
-                        begin
-                                if (rising_edge(CLK)) then
-                                        PS <= NS;
+                 sync_proc: process(CLK,NS)                      --This is the "SYNCHRONOUS" part 
+                        begin                                   --Notice that this part is simple because we don't have a button
+                                if (rising_edge(CLK)) then      
+                                        PS <= NS;               --Any conditions that make the "Present-State" move to the "Next-State" can ony happen at a "CLOCK" tick
                                 end if;
-
                  end process sync_proc;
 
-        comb_proc: process(PS,x1, x2)                           --process inputs
-                begin
-                Z <= '0';                               -- pre-assign the outputs
-                        case PS is
-                                when ST0 =>                             -- items regarding state ST0
-                                        if ( x1 = '0') then
-                                                 NS <= ST0; Z <= '0';
-                                        else 
-                                                 NS <= ST2; Z <= '0';
-                                        end if;
-                                when ST1 =>                     -- items regarding state ST1
-                                        if (x2 = '0') then 
-                                                 NS <= ST0; Z <= '1';
-                                        else 
-                                                 NS <= ST1; Z <= '0';
-                                        end if;
+                comb_proc: process(PS,x1, x2)                           --This is the "COMBINATORIAL" part (Remember this process is SEQUENTIAL)
+                        begin
+                        Z <= '0';                               -- Remember we must always set the output to "0" at the beggining of the SEQUENCE
+                                case PS is
+                                        when ST0 =>                             -- When the "Preset-State" is "ST0"  the indexed condition below is executed
+                                                if ( x1 = '0') then              --Notice that here we only rely on one of the variations of the "MAIN-INPUT" 
+                                                         NS <= ST0; Z <= '0';   --"Next-State" does not change and the "OUTPUT" needed was "0" (MEALY)
+                                                else 
+                                                         NS <= ST2; Z <= '0';   --"Next-State" Changes and the "OUTPUT" needed was "0" (This is what is required to go to the Other-State
+                                                end if;
+                                        when ST1 =>                     -- When the "Preset-State" is "ST1"
+                                                if (x2 = '0') then              --If this variation of the "INPUT" is "0"
+                                                         NS <= ST0; Z <= '1';     --If also, the "OUTPUT" is "1", then it will move to the "Next-State" of "ST0"
+                                                else 
+                                                         NS <= ST1; Z <= '0';     --If the "OUTPUT" is instead "0", then the "Next-State" will be "ST1"
+                                                end if;
 
-                                when ST2 =>                     -- items regarding state ST2
-                                        if (x2 = '0') then 
-                                                  NS <= ST0; Z <= '1';
-                                        else 
-                                                  NS <= ST1; Z <= '0';
-                                        end if;
-                                when others =>                  -- the catch all condition
-                                        Z <= '0'; 
-                                        NS <= ST0;
-                        end case;
-        end process comb_proc;
+                                        when ST2 =>                     -- When the "Preset-State" is "ST2" (The same conditions as the examples above are followed)
+                                                if (x2 = '0') then 
+                                                          NS <= ST0; Z <= '1';
+                                                else 
+                                                          NS <= ST1; Z <= '0';
+                                                end if;
+                                        when others =>                  -- This is the Catch-All condition (only added as a good practice)
+                                                Z <= '0'; 
+                                                NS <= ST0;
+                                end case;
+                end process comb_proc;
 
-        with PS select                                          --select state
-                Y <=    "10" when ST0,
-                        "11" when ST1,
-                        "01" when ST2,
-                        "10" when others;                               --go back to first state
+        with PS select                           --Here we use "SELECTED-SIGNAL-ASSIGNEMTN"
+                Y <=    "10" when ST0,              --This is the First State represeted in the STATE-DIAGRAM as "(a)"
+                        "11" when ST1,              -- (b)
+                        "01" when ST2,              -- (c)
+                        "10" when others;          --Any other combination of input/output not specified in the "COMBINATORIAL-PROCESS" will make it go back to first state (Not necessary but it is good VHDL practice)
 
 end behavioral;
